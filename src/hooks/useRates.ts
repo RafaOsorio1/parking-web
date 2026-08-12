@@ -1,35 +1,29 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiFetch } from "../libs/api";
-import type { Rate as ParkingRate, ApiResponse } from "../types/parking";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import { RatesServices } from '../services/rates';
+import type { Rate as ParkingRate } from '../types/parking';
 
 export function useRates() {
   const queryClient = useQueryClient();
 
   const ratesQuery = useQuery({
-    queryKey: ["rates"],
-    queryFn: () =>
-      apiFetch<ApiResponse<ParkingRate[]>>("/rates").then((res) => res.data),
+    queryKey: ['rates'],
+    queryFn: () => RatesServices.getRates(),
   });
 
   const createRateMutation = useMutation({
-    mutationFn: (newRate: Partial<ParkingRate>) =>
-      apiFetch("/rates", {
-        method: "POST",
-        body: JSON.stringify(newRate),
-      }),
+    mutationFn: (payload: Partial<ParkingRate>) =>
+      RatesServices.createRate(payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["rates"] });
+      queryClient.invalidateQueries({ queryKey: ['rates'] });
     },
   });
 
   const updateRateMutation = useMutation({
     mutationFn: ({ id, ...data }: Partial<ParkingRate> & { id: string }) =>
-      apiFetch(`/rates/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(data),
-      }),
+      RatesServices.updateRate(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["rates"] });
+      queryClient.invalidateQueries({ queryKey: ['rates'] });
     },
   });
 

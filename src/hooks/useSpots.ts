@@ -1,5 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiFetch } from '../libs/api';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import { httpClient } from '../libs/api';
 
 export interface ParkingSpot {
   id: string;
@@ -13,12 +14,15 @@ export function useSpots() {
 
   const spotsQuery = useQuery({
     queryKey: ['spots'],
-    queryFn: () => apiFetch<{ data: ParkingSpot[] }>('/spots').then(res => res.data),
+    queryFn: () =>
+      httpClient<{ data: ParkingSpot[] }>('/spots')
+        .then((res) => res.json())
+        .then((data) => data.data),
   });
 
   const createSpotMutation = useMutation({
     mutationFn: (newSpot: Partial<ParkingSpot>) =>
-      apiFetch('/spots', {
+      httpClient('/spots', {
         method: 'POST',
         body: JSON.stringify(newSpot),
       }),

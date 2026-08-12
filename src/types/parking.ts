@@ -1,14 +1,14 @@
 import type {
   Prisma,
-  PrismaVehicle,
-  PrismaSpot,
   PrismaRate,
-} from "@rafaosorio/parking-types";
+  PrismaSpot,
+  PrismaVehicle,
+} from '@rafaosorio/parking-types';
 
-export type VehicleType = "CAR" | "MOTORCYCLE";
+export type VehicleType = 'CAR' | 'MOTORCYCLE';
 
 export interface ApiResponse<T> {
-  status: "success" | "error";
+  status: 'success' | 'error';
   data: T;
   message?: string;
 }
