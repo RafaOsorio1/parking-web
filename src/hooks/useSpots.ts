@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { httpClient } from '../libs/api';
+import { SpotsServices } from '../services/spots.services';
 
 export interface ParkingSpot {
   id: string;
@@ -14,18 +14,20 @@ export function useSpots() {
 
   const spotsQuery = useQuery({
     queryKey: ['spots'],
-    queryFn: () =>
-      httpClient<{ data: ParkingSpot[] }>('/spots')
-        .then((res) => res.json())
-        .then((data) => data.data),
+    queryFn: () => SpotsServices.getSpots(),
   });
 
   const createSpotMutation = useMutation({
-    mutationFn: (newSpot: Partial<ParkingSpot>) =>
-      httpClient('/spots', {
-        method: 'POST',
-        body: JSON.stringify(newSpot),
-      }),
+    mutationFn: (payload: Partial<ParkingSpot>) =>
+      SpotsServices.createSpot(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['spots'] });
+    },
+  });
+
+  const updateSpotMutation = useMutation({
+    mutationFn: ({ id, ...data }: Partial<ParkingSpot> & { id: string }) =>
+      SpotsServices.updateSpot(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['spots'] });
     },
@@ -36,5 +38,7 @@ export function useSpots() {
     isLoading: spotsQuery.isLoading,
     createSpot: createSpotMutation.mutate,
     isCreating: createSpotMutation.isPending,
+    updateSpot: updateSpotMutation.mutate,
+    isUpdating: updateSpotMutation.isPending,
   };
 }

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { RatesServices } from '../services/rates';
+import { RatesServices } from '../services/rates.services';
 import type { Rate as ParkingRate } from '../types/parking';
 
 export function useRates() {
