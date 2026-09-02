@@ -50,7 +50,7 @@ export function Settings() {
     createSpotMutation.mutate({
       type: spotConfig.type,
       count: spotConfig.count,
-    } as any);
+    });
   };
 
   const handleUpdateRate = () => {

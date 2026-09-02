@@ -1,13 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { SpotsServices } from '../services/spots.services';
-
-export interface ParkingSpot {
-  id: string;
-  number: string;
-  type: 'CAR' | 'MOTORCYCLE';
-  status: 'AVAILABLE' | 'OCCUPIED' | 'MAINTENANCE';
-}
+import {
+  type CreateBatchSpotsPayload,
+  SpotsServices,
+} from '../services/spots.services';
+import type { Spot } from '../types/parking';
 
 export function useSpots() {
   const queryClient = useQueryClient();
@@ -18,18 +15,20 @@ export function useSpots() {
   });
 
   const createSpotMutation = useMutation({
-    mutationFn: (payload: Partial<ParkingSpot>) =>
-      SpotsServices.createSpot(payload),
+    mutationFn: (payload: CreateBatchSpotsPayload) =>
+      SpotsServices.createSpotsBatch(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['spots'] });
+      queryClient.invalidateQueries({ queryKey: ['occupancyMap'] });
     },
   });
 
   const updateSpotMutation = useMutation({
-    mutationFn: ({ id, ...data }: Partial<ParkingSpot> & { id: string }) =>
+    mutationFn: ({ id, ...data }: Partial<Spot> & { id: string }) =>
       SpotsServices.updateSpot(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['spots'] });
+      queryClient.invalidateQueries({ queryKey: ['occupancyMap'] });
     },
   });
 

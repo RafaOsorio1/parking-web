@@ -1,7 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { httpClient } from '../libs/api';
-import { SpotsServices } from '../services/spots.services';
+import {
+  type CreateBatchSpotsPayload,
+  SpotsServices,
+} from '../services/spots.services';
 import type { ApiResponse, Spot, Ticket } from '../types/parking';
 
 export function useActiveTickets() {
@@ -32,7 +35,8 @@ export function useOccupancyMap() {
 export function useCreateSpot() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: Partial<Spot>) => SpotsServices.createSpot(payload),
+    mutationFn: (payload: CreateBatchSpotsPayload) =>
+      SpotsServices.createSpotsBatch(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['spots'] });
       queryClient.invalidateQueries({ queryKey: ['occupancyMap'] });

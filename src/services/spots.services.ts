@@ -3,21 +3,28 @@ import type { ParkingSpot } from '@rafaosorio/parking-types';
 import { httpClient } from '../libs/api';
 import type { ApiResponse } from '../libs/types';
 
+export interface CreateBatchSpotsPayload {
+  type: 'CAR' | 'MOTORCYCLE';
+  count: number;
+}
+
 export class SpotsServices {
   private constructor() {}
 
   static async getSpots(): Promise<ParkingSpot[]> {
     const response = await httpClient
-      .get('/spots')
+      .get('spots')
       .json<ApiResponse<ParkingSpot[]>>();
 
     return response.data;
   }
 
-  static async createSpot(payload: Partial<ParkingSpot>): Promise<ParkingSpot> {
+  static async createSpotsBatch(
+    payload: CreateBatchSpotsPayload,
+  ): Promise<ParkingSpot[]> {
     const response = await httpClient
-      .post('/spots', { json: payload })
-      .json<ApiResponse<ParkingSpot>>();
+      .post('spots', { json: payload })
+      .json<ApiResponse<ParkingSpot[]>>();
 
     return response.data;
   }
@@ -27,7 +34,7 @@ export class SpotsServices {
     payload: Partial<ParkingSpot>,
   ): Promise<ParkingSpot> {
     const response = await httpClient
-      .put(`/spots/${id}`, { json: payload })
+      .put(`spots/${id}`, { json: payload })
       .json<ApiResponse<ParkingSpot>>();
 
     return response.data;
