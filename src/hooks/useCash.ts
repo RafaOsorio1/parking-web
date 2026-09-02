@@ -6,7 +6,8 @@ import type { ApiResponse, CashSession } from '../types/parking';
 export function useCashSession() {
   return useQuery({
     queryKey: ['cash-session'],
-    queryFn: () => httpClient<ApiResponse<CashSession>>('/cash/active'),
+    queryFn: () =>
+      httpClient.get('cash/active').json<ApiResponse<CashSession>>(),
     retry: false,
   });
 }
@@ -19,10 +20,9 @@ export function useOpenCash() {
       notes?: string;
       openedByName: string;
     }) =>
-      httpClient<ApiResponse<CashSession>>('/cash/open', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      }),
+      httpClient
+        .post('cash/open', { json: data })
+        .json<ApiResponse<CashSession>>(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cash-session'] });
       queryClient.invalidateQueries({ queryKey: ['cash-history'] });
@@ -38,10 +38,9 @@ export function useCloseCash() {
       notes?: string;
       closedByName: string;
     }) =>
-      httpClient<ApiResponse<CashSession>>('/cash/close', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      }),
+      httpClient
+        .post('cash/close', { json: data })
+        .json<ApiResponse<CashSession>>(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cash-session'] });
       queryClient.invalidateQueries({ queryKey: ['cash-history'] });
@@ -52,6 +51,7 @@ export function useCloseCash() {
 export function useCashHistory() {
   return useQuery({
     queryKey: ['cash-history'],
-    queryFn: () => httpClient<ApiResponse<CashSession[]>>('/cash/history'),
+    queryFn: () =>
+      httpClient.get('cash/history').json<ApiResponse<CashSession[]>>(),
   });
 }

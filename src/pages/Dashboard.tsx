@@ -21,7 +21,7 @@ export function Dashboard() {
   } = useSpots();
 
   const activeTickets = ticketsResponse?.data || [];
-  const spots = spotsResponse?.data || [];
+  const spots = spotsResponse || [];
 
   const apiStatus =
     !isLoadingTickets && !isLoadingSpots && (isErrorTickets || isErrorSpots)

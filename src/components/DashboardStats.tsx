@@ -19,10 +19,10 @@ export function DashboardStats({
     totalSpots === 0 ? 0 : Math.round((occupiedSpots / totalSpots) * 100);
 
   const carTickets = activeTickets.filter(
-    (t) => t.vehicle.type === 'CAR',
+    (t) => t.vehicle?.type === 'CAR',
   ).length;
   const bikeTickets = activeTickets.filter(
-    (t) => t.vehicle.type === 'MOTORCYCLE',
+    (t) => t.vehicle?.type === 'MOTORCYCLE',
   ).length;
 
   const stats = [

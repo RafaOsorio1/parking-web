@@ -6,7 +6,7 @@ import { ActiveTicketsTable } from '../components/ActiveTicketsTable';
 import { Modal } from '../components/Modal';
 import { TicketSummary } from '../components/TicketSummary';
 import { useActiveTickets, useCheckIn, useSpots } from '../hooks/useParking';
-import type { Ticket } from '../types/parking';
+import type { Spot, Ticket } from '../types/parking';
 
 export function CheckIn() {
   const [searchParams] = useSearchParams();
@@ -24,13 +24,13 @@ export function CheckIn() {
   const checkInMutation = useCheckIn();
 
   const activeTickets = ticketsResponse?.data || [];
-  const spots = spotsResponse?.data || [];
+  const spots = spotsResponse || [];
 
   // Efecto para leer el puesto desde la URL (procedente del Mapa)
   useEffect(() => {
     const spotFromUrl = searchParams.get('spot');
     if (spotFromUrl) {
-      const spotObj = spots.find((s) => s.number === spotFromUrl);
+      const spotObj = spots.find((s: Spot) => s.number === spotFromUrl);
       if (spotObj) {
         setSelectedSpotNumber(spotObj.number);
         setType(spotObj.type === 'CAR' ? 'car' : 'bike');
@@ -39,7 +39,7 @@ export function CheckIn() {
   }, [searchParams, spots]);
 
   const availableSpots = spots.filter(
-    (s) =>
+    (s: Spot) =>
       s.status === 'AVAILABLE' &&
       s.type === (type === 'car' ? 'CAR' : type === 'bike' ? 'MOTORCYCLE' : ''),
   );
@@ -53,10 +53,10 @@ export function CheckIn() {
     // Si no, buscamos el primer disponible automáticamente.
     const finalSpot = selectedSpotNumber
       ? spots.find(
-          (s) => s.number === selectedSpotNumber && s.status === 'AVAILABLE',
+          (s: Spot) => s.number === selectedSpotNumber && s.status === 'AVAILABLE',
         )
       : spots.find(
-          (s) => s.status === 'AVAILABLE' && s.type === targetVehicleType,
+          (s: Spot) => s.status === 'AVAILABLE' && s.type === targetVehicleType,
         );
 
     if (!finalSpot) {
@@ -73,7 +73,7 @@ export function CheckIn() {
         spotNumber: finalSpot.number,
       },
       {
-        onSuccess: (response) => {
+        onSuccess: (response: any) => {
           setCreatedTicket(response.data);
           setShowModal(true);
           setPlate('');

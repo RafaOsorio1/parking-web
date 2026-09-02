@@ -31,11 +31,11 @@ export function CheckOut() {
 
   const handleCheckOut = (target: string | Ticket) => {
     const plateToProcess =
-      typeof target === 'string' ? target : target.vehicle.plate;
+      typeof target === 'string' ? target : target.vehicle?.plate;
     if (!plateToProcess) return;
 
     checkOutMutation.mutate(plateToProcess.toUpperCase(), {
-      onSuccess: (response) => {
+      onSuccess: (response: any) => {
         setCompletedTicket(response.data);
         setShowModal(true);
         setPlate('');

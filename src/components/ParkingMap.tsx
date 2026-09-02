@@ -1,4 +1,4 @@
-import { ArrowRight, Bike, Car, Clock, Info, MapPin } from 'lucide-react';
+import { ArrowRight, Bike, Car, Clock, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { useOccupancyMap } from '../hooks/useParking';
@@ -10,7 +10,7 @@ export function ParkingMap() {
   const spots = spotsResponse?.data || [];
 
   // Agrupar por prefijo (primera letra del número de espacio)
-  const groupedSpots = spots.reduce((acc: Record<string, any[]>, spot) => {
+  const groupedSpots = spots.reduce((acc: Record<string, any[]>, spot: any) => {
     const prefix = spot.number.match(/^[A-Z]+/)?.[0] || '#';
     if (!acc[prefix]) acc[prefix] = [];
     acc[prefix].push(spot);
@@ -39,12 +39,12 @@ export function ParkingMap() {
               SECCIÓN {prefix}
             </div>
             <h2 className='text-slate-500 text-sm font-bold uppercase tracking-widest'>
-              {spotsInSection.length} ESPACIOS TOTALES
+              {(spotsInSection as any[]).length} ESPACIOS TOTALES
             </h2>
           </div>
 
           <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4'>
-            {spotsInSection.map((spot) => {
+            {(spotsInSection as any[]).map((spot: any) => {
               const activeTicket = spot.tickets?.[0];
               const isOccupied = !!activeTicket;
 

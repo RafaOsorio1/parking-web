@@ -1,8 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import {
   AlertCircle,
-  ArrowDownRight,
-  ArrowUpRight,
   Banknote,
   Calculator,
   CircleDollarSign,
@@ -21,6 +19,7 @@ import {
   useCloseCash,
   useOpenCash,
 } from '../hooks/useCash';
+import type { CashSession } from '../types/parking';
 
 export function CashManagement() {
   const [initialAmount, setInitialAmount] = useState<string>('');
@@ -275,7 +274,7 @@ export function CashManagement() {
           </div>
         ) : (
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {history.map((item) => (
+            {history.map((item: CashSession) => (
               <div
                 key={item.id}
                 className='bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 hover:border-slate-700 transition-all group'

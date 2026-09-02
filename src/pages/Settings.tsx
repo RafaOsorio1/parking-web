@@ -24,14 +24,10 @@ export function Settings() {
     updateRate,
     createRate,
   } = useRates();
-  const {
-    data: spotsResponse,
-    isLoading: isLoadingSpots,
-    refetch: refetchSpots,
-  } = useSpots();
+  const query = useSpots();
   const createSpotMutation = useCreateSpot();
 
-  const spots = spotsResponse?.data || [];
+  const spots = query.data || [];
 
   const [spotConfig, setSpotConfig] = useState({
     type: 'CAR' as 'CAR' | 'MOTORCYCLE',
@@ -39,7 +35,6 @@ export function Settings() {
     prefix: 'C',
   });
 
-  // Estado para edición de tarifas
   const [editingRate, setEditingRate] = useState<Rate | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newRateData, setNewRateData] = useState({
@@ -51,23 +46,11 @@ export function Settings() {
     dailyMax: 0,
   });
 
-  const handleGenerateSpots = async () => {
-    if (spotConfig.count <= 0) return;
-    const existingSpots = spots.filter(
-      (s) => s.type === spotConfig.type,
-    ).length;
-    let successCount = 0;
-    for (let i = 1; i <= spotConfig.count; i++) {
-      const number = `${spotConfig.prefix}${existingSpots + i}`;
-      try {
-        await createSpotMutation.mutateAsync({ number, type: spotConfig.type });
-        successCount++;
-      } catch (e) {
-        console.error('Error creating spot', e);
-      }
-    }
-    alert(`Se crearon ${successCount} espacios exitosamente.`);
-    refetchSpots();
+  const handleGenerateSpots = () => {
+    createSpotMutation.mutate({
+      type: spotConfig.type,
+      count: spotConfig.count,
+    } as any);
   };
 
   const handleUpdateRate = () => {
@@ -180,7 +163,7 @@ export function Settings() {
             <div className='bg-slate-900 border border-slate-800 p-6 rounded-2xl flex flex-col items-center justify-center shadow-xl'>
               <Car size={48} className='text-blue-500 mb-4 opacity-80' />
               <h4 className='text-5xl font-black text-white'>
-                {isLoadingSpots ? '-' : carSpots.length}
+                {query.isLoading ? '-' : carSpots.length}
               </h4>
               <p className='text-slate-400 mt-2 font-medium'>
                 Espacios de Carro
@@ -189,7 +172,7 @@ export function Settings() {
             <div className='bg-slate-900 border border-slate-800 p-6 rounded-2xl flex flex-col items-center justify-center shadow-xl'>
               <Bike size={48} className='text-purple-500 mb-4 opacity-80' />
               <h4 className='text-5xl font-black text-white'>
-                {isLoadingSpots ? '-' : bikeSpots.length}
+                {query.isLoading ? '-' : bikeSpots.length}
               </h4>
               <p className='text-slate-400 mt-2 font-medium'>
                 Espacios de Moto

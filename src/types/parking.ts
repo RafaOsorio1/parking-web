@@ -1,8 +1,9 @@
 import type {
-  Prisma,
-  PrismaRate,
-  PrismaSpot,
-  PrismaVehicle,
+  CashSession as PrismaCashSession,
+  ParkingRate as PrismaParkingRate,
+  ParkingSpot as PrismaParkingSpot,
+  Ticket as PrismaTicket,
+  Vehicle as PrismaVehicle,
 } from '@rafaosorio/parking-types';
 
 export type VehicleType = 'CAR' | 'MOTORCYCLE';
@@ -14,25 +15,19 @@ export interface ApiResponse<T> {
 }
 
 export type Vehicle = PrismaVehicle;
-export type Spot = PrismaSpot;
-export type Rate = PrismaRate;
-export type CashSession = Prisma.CashSessionGetPayload<{
-  include: {
-    _count?: {
-      select: { tickets: true };
-    };
+export type Spot = PrismaParkingSpot;
+export type Rate = PrismaParkingRate;
+
+export type CashSession = PrismaCashSession & {
+  _count?: {
+    tickets: number;
   };
-}> & {
   currentExpected?: number;
-  openedByName?: string;
-  closedByName?: string;
 };
 
-export type Ticket = Prisma.TicketGetPayload<{
-  include: {
-    vehicle: true;
-    spot: true;
-    rate: true;
-    cashSession?: true;
-  };
-}>;
+export type Ticket = PrismaTicket & {
+  vehicle?: Vehicle;
+  spot?: Spot;
+  rate?: Rate | null;
+  cashSession?: CashSession | null;
+};
