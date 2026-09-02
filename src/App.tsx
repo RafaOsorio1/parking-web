@@ -1,26 +1,34 @@
-import { Route, HashRouter as Router, Routes } from 'react-router-dom';
+import { createHashHistory, createRouter, RouterProvider } from '@tanstack/react-router';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { routeTree } from './routeTree.gen';
 
-import { MainLayout } from './layouts/MainLayout';
-import { CashManagement } from './pages/CashManagement';
-import { Dashboard } from './pages/Dashboard';
-import { Settings } from './pages/Settings';
-import { CheckIn } from './pages/checkIn';
-import { CheckOut } from './pages/checkOut';
+// Usamos createHashHistory para compatibilidad directa con Electron/SPAs estáticas
+const hashHistory = createHashHistory();
 
-function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route element={<MainLayout />}>
-          <Route path='/' element={<Dashboard />} />
-          <Route path='/settings' element={<Settings />} />
-          <Route path='/entrada' element={<CheckIn />} />
-          <Route path='/salida' element={<CheckOut />} />
-          <Route path='/arqueo' element={<CashManagement />} />
-        </Route>
-      </Routes>
-    </Router>
-  );
+const router = createRouter({
+  routeTree,
+  history: hashHistory,
+  context: {
+    auth: undefined!, // Se inyecta dinámicamente en el componente
+  },
+});
+
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router;
+  }
 }
 
-export default App;
+function InnerApp() {
+  const auth = useAuth();
+
+  return <RouterProvider router={router} context={{ auth }} />;
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <InnerApp />
+    </AuthProvider>
+  );
+}

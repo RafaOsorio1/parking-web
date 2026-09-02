@@ -1,5 +1,5 @@
 import { ArrowRight, Bike, Car, Clock, Info } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 
 import { useOccupancyMap } from '../hooks/useParking';
 
@@ -53,9 +53,15 @@ export function ParkingMap() {
                   key={spot.id}
                   onClick={() => {
                     if (isOccupied) {
-                      navigate(`/salida?plate=${activeTicket.vehicle.plate}`);
+                      navigate({
+                        to: '/salida',
+                        search: { plate: activeTicket.vehicle.plate },
+                      });
                     } else {
-                      navigate(`/entrada?spot=${spot.number}`);
+                      navigate({
+                        to: '/entrada',
+                        search: { spot: spot.number },
+                      });
                     }
                   }}
                   className={`relative group cursor-pointer h-32 rounded-2xl border transition-all duration-300 flex flex-col items-center justify-center gap-2 overflow-hidden ${

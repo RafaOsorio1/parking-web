@@ -1,6 +1,6 @@
 import { Bike, Car, MapPin, Settings as SettingsIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearch } from '@tanstack/react-router';
 
 import { ActiveTicketsTable } from '../components/ActiveTicketsTable';
 import { Modal } from '../components/Modal';
@@ -9,7 +9,7 @@ import { useActiveTickets, useCheckIn, useSpots } from '../hooks/useParking';
 import type { Spot, Ticket } from '../types/parking';
 
 export function CheckIn() {
-  const [searchParams] = useSearchParams();
+  const search: any = useSearch({ strict: false });
   const [type, setType] = useState<'car' | 'bike' | null>(null);
   const [plate, setPlate] = useState('');
   const [selectedSpotNumber, setSelectedSpotNumber] = useState<string | null>(
@@ -28,7 +28,7 @@ export function CheckIn() {
 
   // Efecto para leer el puesto desde la URL (procedente del Mapa)
   useEffect(() => {
-    const spotFromUrl = searchParams.get('spot');
+    const spotFromUrl = search?.spot;
     if (spotFromUrl) {
       const spotObj = spots.find((s: Spot) => s.number === spotFromUrl);
       if (spotObj) {
@@ -36,7 +36,7 @@ export function CheckIn() {
         setType(spotObj.type === 'CAR' ? 'car' : 'bike');
       }
     }
-  }, [searchParams, spots]);
+  }, [search, spots]);
 
   const availableSpots = spots.filter(
     (s: Spot) =>

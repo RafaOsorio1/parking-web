@@ -1,6 +1,6 @@
 import { LogOut, Search, Ticket as TicketIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearch } from '@tanstack/react-router';
 
 import { ActiveTicketsTable } from '../components/ActiveTicketsTable';
 import { Modal } from '../components/Modal';
@@ -9,7 +9,7 @@ import { useActiveTickets, useCheckOut } from '../hooks/useParking';
 import type { Ticket } from '../types/parking';
 
 export function CheckOut() {
-  const [searchParams] = useSearchParams();
+  const search: any = useSearch({ strict: false });
   const [plate, setPlate] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [completedTicket, setCompletedTicket] = useState<Ticket | null>(null);
@@ -21,13 +21,13 @@ export function CheckOut() {
 
   // Efecto para procesar placa desde URL (procedente del Mapa)
   useEffect(() => {
-    const plateFromUrl = searchParams.get('plate');
+    const plateFromUrl = search?.plate;
     if (plateFromUrl) {
       setPlate(plateFromUrl);
       // Opcional: Procesar automáticamente si viene de la URL
       handleCheckOut(plateFromUrl);
     }
-  }, [searchParams]);
+  }, [search]);
 
   const handleCheckOut = (target: string | Ticket) => {
     const plateToProcess =
