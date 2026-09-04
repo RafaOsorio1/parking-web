@@ -1,4 +1,4 @@
-import { Bike, Car, MapPin, Settings as SettingsIcon } from 'lucide-react';
+import { Accessibility, AlertCircle, Bike, Car, MapPin, Settings as SettingsIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useSearch } from '@tanstack/react-router';
 
@@ -15,6 +15,7 @@ export function CheckIn() {
   const [selectedSpotNumber, setSelectedSpotNumber] = useState<string | null>(
     null,
   );
+  const [isAccessibleRequired, setIsAccessibleRequired] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [createdTicket, setCreatedTicket] = useState<Ticket | null>(null);
 
@@ -44,20 +45,50 @@ export function CheckIn() {
       s.type === (type === 'car' ? 'CAR' : type === 'bike' ? 'MOTORCYCLE' : ''),
   );
 
+  const accessibleAvailableCount = availableSpots.filter(
+    (s: any) => s.isAccessible,
+  ).length;
+
   const handleCheckIn = () => {
     if (!type || !plate) return;
 
     const targetVehicleType = type === 'car' ? 'CAR' : 'MOTORCYCLE';
 
     // Si hay un puesto seleccionado manualmente (desde el mapa), lo usamos.
-    // Si no, buscamos el primer disponible automáticamente.
-    const finalSpot = selectedSpotNumber
-      ? spots.find(
-          (s: Spot) => s.number === selectedSpotNumber && s.status === 'AVAILABLE',
-        )
-      : spots.find(
-          (s: Spot) => s.status === 'AVAILABLE' && s.type === targetVehicleType,
+    // Si no, buscamos con prioridad PMR o estándar.
+    let finalSpot: Spot | undefined;
+
+    if (selectedSpotNumber) {
+      finalSpot = spots.find(
+        (s: Spot) => s.number === selectedSpotNumber && s.status === 'AVAILABLE',
+      );
+    } else if (isAccessibleRequired) {
+      // Priorizar puesto accesible libre
+      finalSpot =
+        spots.find(
+          (s: any) =>
+            s.status === 'AVAILABLE' &&
+            s.type === targetVehicleType &&
+            s.isAccessible,
+        ) ||
+        spots.find(
+          (s: Spot) =>
+            s.status === 'AVAILABLE' && s.type === targetVehicleType,
         );
+    } else {
+      // Priorizar puestos regulares para preservar los accesibles a quienes los necesitan
+      finalSpot =
+        spots.find(
+          (s: any) =>
+            s.status === 'AVAILABLE' &&
+            s.type === targetVehicleType &&
+            !s.isAccessible,
+        ) ||
+        spots.find(
+          (s: Spot) =>
+            s.status === 'AVAILABLE' && s.type === targetVehicleType,
+        );
+    }
 
     if (!finalSpot) {
       alert(
@@ -168,6 +199,67 @@ export function CheckIn() {
               }}
             />
           </div>
+        </div>
+
+        {/* Selector de Cliente PMR / Accesible */}
+        <div className='space-y-3'>
+          <div className='flex items-center justify-between p-4 bg-slate-950 border border-slate-800 rounded-2xl'>
+            <div className='flex items-center gap-3.5'>
+              <div
+                className={`p-2.5 rounded-xl transition-colors ${
+                  isAccessibleRequired
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-900 text-slate-500'
+                }`}
+              >
+                <Accessibility size={22} />
+              </div>
+              <div>
+                <p className='text-sm font-bold text-white flex items-center gap-2'>
+                  Cliente con Movilidad Reducida (PMR ♿)
+                  {type && (
+                    <span
+                      className={`text-[10px] uppercase font-mono font-bold px-2 py-0.5 rounded-md ${
+                        accessibleAvailableCount > 0
+                          ? 'bg-blue-500/20 text-blue-400'
+                          : 'bg-slate-800 text-slate-500'
+                      }`}
+                    >
+                      {accessibleAvailableCount}{' '}
+                      {accessibleAvailableCount === 1 ? 'libre' : 'libres'}
+                    </span>
+                  )}
+                </p>
+                <p className='text-xs text-slate-500'>
+                  Prioriza la asignación de espacios amplios y de fácil acceso
+                </p>
+              </div>
+            </div>
+            <button
+              type='button'
+              onClick={() => setIsAccessibleRequired(!isAccessibleRequired)}
+              className={`w-14 h-8 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 ease-in-out ${
+                isAccessibleRequired ? 'bg-blue-600' : 'bg-slate-800'
+              }`}
+            >
+              <div
+                className={`bg-white w-6 h-6 rounded-full shadow-md transform transition-transform duration-300 ease-in-out ${
+                  isAccessibleRequired ? 'translate-x-6' : 'translate-x-0'
+                }`}
+              />
+            </button>
+          </div>
+
+          {isAccessibleRequired && type && accessibleAvailableCount === 0 && (
+            <div className='flex items-center gap-3 text-amber-400 text-xs bg-amber-500/10 border border-amber-500/20 p-3.5 rounded-2xl animate-in fade-in'>
+              <AlertCircle size={18} className='shrink-0 text-amber-400' />
+              <span>
+                No quedan espacios accesibles (PMR) libres para{' '}
+                {type === 'car' ? 'carros' : 'motos'}. El sistema asignará el
+                espacio estándar disponible más próximo.
+              </span>
+            </div>
+          )}
         </div>
 
         <div className='space-y-4'>

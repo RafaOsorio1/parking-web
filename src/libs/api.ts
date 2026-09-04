@@ -9,6 +9,14 @@ export const httpClient = ky.create({
     'Content-Type': 'application/json',
   },
   hooks: {
+    beforeRequest: [
+      ({ request }) => {
+        const token = localStorage.getItem('parking_token');
+        if (token) {
+          request.headers.set('Authorization', `Bearer ${token}`);
+        }
+      },
+    ],
     beforeError: [
       async (error: HTTPError) => {
         const { response } = error;

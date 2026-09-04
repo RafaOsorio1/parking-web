@@ -1,4 +1,4 @@
-import { Activity, Car, Hash } from 'lucide-react';
+import { Accessibility, Activity, Car, Hash } from 'lucide-react';
 
 import type { Spot, Ticket } from '../types/parking';
 
@@ -25,6 +25,11 @@ export function DashboardStats({
     (t) => t.vehicle?.type === 'MOTORCYCLE',
   ).length;
 
+  const accessibleSpots = spots.filter((s: any) => s.isAccessible);
+  const freeAccessible = accessibleSpots.filter(
+    (s) => s.status === 'AVAILABLE',
+  ).length;
+
   const stats = [
     {
       label: 'Vehículos Activos',
@@ -33,7 +38,7 @@ export function DashboardStats({
       color: 'text-blue-400',
     },
     {
-      label: 'Ocupación',
+      label: 'Ocupación General',
       value: `${occupancyPercent}%`,
       icon: Activity,
       color: occupancyPercent > 80 ? 'text-red-400' : 'text-emerald-400',
@@ -45,10 +50,11 @@ export function DashboardStats({
       color: 'text-purple-400',
     },
     {
-      label: 'Estado API',
-      value: apiStatus,
-      icon: Hash,
-      color: apiStatus === 'OK' ? 'text-green-400' : 'text-red-400',
+      label: 'Espacios PMR ♿',
+      value: accessibleSpots.length > 0 ? `${freeAccessible} de ${accessibleSpots.length}` : '0',
+      sublabel: accessibleSpots.length > 0 ? (freeAccessible > 0 ? 'Disponibles' : 'Agotados') : 'Sin configurar',
+      icon: Accessibility,
+      color: freeAccessible > 0 ? 'text-blue-400' : 'text-slate-500',
     },
   ];
 
@@ -66,15 +72,24 @@ export function DashboardStats({
             <div className={`p-3 rounded-xl bg-slate-950/50 ${stat.color}`}>
               <stat.icon size={24} />
             </div>
-            <span className='text-xs font-bold text-slate-500 uppercase tracking-widest bg-slate-950 px-3 py-1 rounded-full'>
-              Live
+            <span
+              className={`text-xs font-bold uppercase tracking-widest bg-slate-950 px-3 py-1 rounded-full ${
+                apiStatus === 'OK' ? 'text-slate-500' : 'text-red-400'
+              }`}
+            >
+              {apiStatus === 'OK' ? 'Live' : apiStatus}
             </span>
           </div>
           <p className='text-4xl font-black tracking-tight text-white relative z-10'>
             {stat.value}
           </p>
-          <p className='text-sm font-medium text-slate-400 mt-1 relative z-10'>
-            {stat.label}
+          <p className='text-sm font-medium text-slate-400 mt-1 relative z-10 flex items-center justify-between'>
+            <span>{stat.label}</span>
+            {stat.sublabel && (
+              <span className='text-xs text-blue-400 font-bold'>
+                {stat.sublabel}
+              </span>
+            )}
           </p>
         </div>
       ))}

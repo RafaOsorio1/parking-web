@@ -6,6 +6,7 @@ import type { ApiResponse } from '../libs/types';
 export interface CreateBatchSpotsPayload {
   type: 'CAR' | 'MOTORCYCLE';
   count: number;
+  isAccessible?: boolean;
 }
 
 export class SpotsServices {

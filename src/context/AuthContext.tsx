@@ -30,6 +30,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (payload: LoginPayload) => {
     const res = await AuthService.login(payload);
+    if (res.token) {
+      localStorage.setItem('parking_token', res.token);
+    }
     setUser(res.user);
     return res.user;
   };
@@ -38,6 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await AuthService.logout();
     } finally {
+      localStorage.removeItem('parking_token');
       setUser(null);
     }
   };

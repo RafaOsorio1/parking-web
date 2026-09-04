@@ -1,4 +1,4 @@
-import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
+import { createRootRouteWithContext, Navigate, Outlet } from '@tanstack/react-router';
 import type { AuthContextType } from '../context/AuthContext';
 
 export interface RouterContext {
@@ -7,6 +7,7 @@ export interface RouterContext {
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootComponent,
+  notFoundComponent: () => <Navigate to='/' />,
 });
 
 function RootComponent() {

@@ -6,11 +6,19 @@ export interface AuthUser {
   name: string;
   email: string;
   role: 'ADMIN' | 'OPERATOR';
+  createdAt?: string;
 }
 
 export interface LoginPayload {
   email: string;
   password: string;
+}
+
+export interface RegisterPayload {
+  name: string;
+  email: string;
+  password: string;
+  role?: 'ADMIN' | 'OPERATOR';
 }
 
 export interface LoginResponse {
@@ -36,6 +44,22 @@ export class AuthService {
   static async getMe(): Promise<AuthUser> {
     const response = await httpClient
       .get('auth/me')
+      .json<ApiResponse<AuthUser>>();
+
+    return response.data;
+  }
+
+  static async getUsers(): Promise<AuthUser[]> {
+    const response = await httpClient
+      .get('auth/users')
+      .json<ApiResponse<AuthUser[]>>();
+
+    return response.data;
+  }
+
+  static async registerUser(payload: RegisterPayload): Promise<AuthUser> {
+    const response = await httpClient
+      .post('auth/register', { json: payload })
       .json<ApiResponse<AuthUser>>();
 
     return response.data;

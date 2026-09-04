@@ -1,4 +1,4 @@
-import { ArrowRight, Bike, Car, Clock, Info } from 'lucide-react';
+import { Accessibility, ArrowRight, Bike, Car, Clock, Info } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
 
 import { useOccupancyMap } from '../hooks/useParking';
@@ -67,17 +67,37 @@ export function ParkingMap() {
                   className={`relative group cursor-pointer h-32 rounded-2xl border transition-all duration-300 flex flex-col items-center justify-center gap-2 overflow-hidden ${
                     isOccupied
                       ? 'bg-red-500/5 border-red-500/20 hover:border-red-500/50 hover:bg-red-500/10'
+                      : spot.isAccessible
+                      ? 'bg-blue-950/30 border-blue-500/40 hover:border-blue-400 hover:bg-blue-900/20 ring-1 ring-blue-500/20'
                       : 'bg-slate-900 border-slate-800 hover:border-emerald-500/50 hover:bg-emerald-500/5'
                   }`}
                 >
                   {/* Numero de espacio */}
                   <span
                     className={`absolute top-2 left-3 text-[10px] font-black uppercase tracking-tighter ${
-                      isOccupied ? 'text-red-500/50' : 'text-slate-600'
+                      isOccupied
+                        ? 'text-red-500/50'
+                        : spot.isAccessible
+                        ? 'text-blue-400'
+                        : 'text-slate-600'
                     }`}
                   >
                     {spot.number}
                   </span>
+
+                  {/* Badge Accesible PMR */}
+                  {spot.isAccessible && (
+                    <span
+                      title='Espacio Accesible (PMR ♿)'
+                      className={`absolute top-2 right-2.5 p-1 rounded-md text-[10px] flex items-center justify-center ${
+                        isOccupied
+                          ? 'bg-blue-500/20 text-blue-300'
+                          : 'bg-blue-500/20 text-blue-400 ring-1 ring-blue-500/40'
+                      }`}
+                    >
+                      <Accessibility size={12} />
+                    </span>
+                  )}
 
                   {/* Icono de Vehiculo */}
                   <div
